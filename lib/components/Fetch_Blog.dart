@@ -41,10 +41,12 @@ class _GoogleDriveState extends State<FetchDriveData> {
   void initState() {
     super.initState();
     fetchGoogleDocsHtml();
+
     controller = WebViewController()
       ..loadRequest(
         Uri.parse(link),
       );
+    controller.runJavaScript('window.scrollTo(0, 500);');
   }
 
   Future<void> fetchGoogleDocsHtml() async {
@@ -56,6 +58,8 @@ class _GoogleDriveState extends State<FetchDriveData> {
           docHtml = response.body;
           isLoading = false;
         });
+
+        // Scroll to a specific height after the WebView has loaded
       } else {
         setState(() {
           docHtml = 'Failed to fetch content';
@@ -71,10 +75,10 @@ class _GoogleDriveState extends State<FetchDriveData> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
+      backgroundColor: Color(0xFF7A9D54),
       appBar: AppBar(
         backgroundColor: Color(0xFF557A46),
         title: Text(
@@ -88,8 +92,14 @@ class _GoogleDriveState extends State<FetchDriveData> {
       ),
       body: Stack(
         children: [
-          WebViewWidget(
-            controller: controller,
+          Positioned(
+            top: -90,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: WebViewWidget(
+              controller: controller,
+            ),
           ),
           if (isLoading)
             Center(

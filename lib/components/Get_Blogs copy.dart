@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kisan/components/Fetch_Blog.dart';
+import 'package:kisan/components/Navigation.dart';
+
+import '../main.dart';
 
 class GetBlogss extends StatelessWidget {
   final String title;
 
   const GetBlogss({Key? key, required this.title}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Google Docs Viewer',
+      title: 'Farmers App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green, // Adjust color based on agriculture theme
       ),
       home: GoogleDrive(title: title),
     );
@@ -21,6 +26,7 @@ class GoogleDrive extends StatefulWidget {
   final String title;
 
   const GoogleDrive({Key? key, required this.title}) : super(key: key);
+
   @override
   _GoogleDriveState createState() => _GoogleDriveState(title: title);
 }
@@ -53,13 +59,6 @@ class _GoogleDriveState extends State<GoogleDrive> {
         docText = response.body;
         jsonData = convertTextToJson(docText);
       });
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DisplayCardsPage(jsonData),
-        ),
-      );
     } else {
       setState(() {
         docText = 'Failed to fetch content';
@@ -71,24 +70,73 @@ class _GoogleDriveState extends State<GoogleDrive> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Google Docs Content'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [],
-            ),
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xFFF2EE9D),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Navigation()),
+            );
+          },
+        ),
+        backgroundColor: Color(0xFF557A46),
+        title: Text(
+          '$title',
+          style: const TextStyle(
+              color: Color(0xFFF2EE9D), fontWeight: FontWeight.bold),
         ),
       ),
+      backgroundColor: Color(0xFF7A9D54),
+      body: jsonData.isEmpty
+          ? Center(
+              child: RefreshProgressIndicator(
+                backgroundColor: Color(0xFF557A46),
+                color: Color(0xFFF2EE9D),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: jsonData.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  elevation: 5, // Add elevation for a card-like effect
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      jsonData[index]['title'] ?? '',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    subtitle: Text(
+                      jsonData[index]['description'] ?? '',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FetchDriveData(
+                            title: jsonData[index]['title'] ?? '',
+                            description: jsonData[index]['description'] ?? '',
+                            link: jsonData[index]['link'] ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
     );
   }
 
   List<Map<String, String>> convertTextToJson(String text) {
-    // Replace this logic with your own parsing logic
-    // This is a simple example, you might need to handle line breaks, etc.
     List<String> lines = text.split('\n');
     List<Map<String, String>> jsonData = [];
     Map<String, String> currentEntry = {};
@@ -98,7 +146,7 @@ class _GoogleDriveState extends State<GoogleDrive> {
       if (line.isNotEmpty) {
         if (line.startsWith('"title"')) {
           currentEntry = {
-            'title': line.split(':')[1].trim().replaceAll('"', '')
+            'title': line.split(':')[1].trim().replaceAll('"', ''),
           };
         } else if (line.startsWith('"description"')) {
           currentEntry['description'] =
@@ -111,83 +159,5 @@ class _GoogleDriveState extends State<GoogleDrive> {
     }
 
     return jsonData;
-  }
-}
-
-class DisplayCardsPage extends StatelessWidget {
-  final List<Map<String, String>> jsonData;
-
-  DisplayCardsPage(this.jsonData);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Display Cards'),
-      ),
-      body: ListView.builder(
-        itemCount: jsonData.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(jsonData[index]['title'] ?? ''),
-              subtitle: Text(jsonData[index]['description'] ?? ''),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailsPage(
-                      title: jsonData[index]['title'] ?? '',
-                      description: jsonData[index]['description'] ?? '',
-                      link: jsonData[index]['link'] ?? '',
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class DetailsPage extends StatelessWidget {
-  final String title;
-  final String description;
-  final String link;
-
-  DetailsPage(
-      {required this.title, required this.description, required this.link});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Details Page'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Title: $title',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Description: $description',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Link: $link',
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

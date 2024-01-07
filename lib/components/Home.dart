@@ -12,15 +12,17 @@ class HomePage extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
+            // crossAxisAlignment: CrossAxisAlignment.stretch, // Remove this line
             children: [
-              Text(
-                "Learn Farming Methods",
-                style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
+              // Text(
+              //   "Learn Farming Methods",
+              //   style: TextStyle(
+              //       fontSize: 25,
+              //       fontWeight: FontWeight.bold,
+              //       color: Colors.white),
+              // ),
               SizedBox(height: 16),
               ClickableCategoryCard(
                 icon: Icons.eco,

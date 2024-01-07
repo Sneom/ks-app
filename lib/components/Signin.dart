@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kisan/components/Auth.dart';
 import 'package:kisan/main.dart';
@@ -89,9 +90,10 @@ class _SignInPageState extends State<SignInPage> {
 
   Future<void> _googleSignIn() async {
     try {
-      const webClientId = '';
-      const iosClientId = '';
+      await dotenv.load(); // Load environment variables
 
+      final webClientId = dotenv.env['webClientId'];
+      final iosClientId = dotenv.env['iosClientId'];
       final GoogleSignIn googleSignIn = GoogleSignIn(
         clientId: iosClientId,
         serverClientId: webClientId,

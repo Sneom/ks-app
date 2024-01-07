@@ -11,10 +11,6 @@ class GetBlogs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Farmers App',
-      theme: ThemeData(
-        primarySwatch: Colors.green, // Adjust color based on agriculture theme
-      ),
       home: GoogleDrive(title: title),
     );
   }
@@ -26,111 +22,198 @@ class GoogleDrive extends StatefulWidget {
   const GoogleDrive({Key? key, required this.title}) : super(key: key);
 
   @override
-  _GoogleDriveState createState() => _GoogleDriveState(title: title);
+  _GoogleDriveState createState() => _GoogleDriveState();
 }
 
 class _GoogleDriveState extends State<GoogleDrive> {
-  final String title;
-
-  _GoogleDriveState({Key? key, required this.title}) : super();
-
-  String docText = '';
-  List<Map<String, String>> jsonData = [];
+  late Future<List<Map<String, String>>> _fetchGoogleDocsText;
 
   @override
   void initState() {
     super.initState();
-    fetchGoogleDocsText();
+    _fetchGoogleDocsText = fetchGoogleDocsText();
   }
 
-  Future<void> fetchGoogleDocsText() async {
-    String link = "";
-    if (title.toLowerCase() == "organic farming") {
+  Future<List<Map<String, String>>> fetchGoogleDocsText() async {
+    String link = '';
+    if (widget.title.toLowerCase() == 'organic farming') {
       link =
-          "https://docs.google.com/document/d/1TAopV6MvmqEmEttnW0gB32IYtMcDb4vW_yKV9i1sIvg/export?format=txt";
+          'https://docs.google.com/document/d/1TAopV6MvmqEmEttnW0gB32IYtMcDb4vW_yKV9i1sIvg/export?format=txt';
     }
 
     final response = await http.get(Uri.parse(link));
 
     if (response.statusCode == 200) {
-      setState(() {
-        docText = response.body;
-        jsonData = convertTextToJson(docText);
-      });
+      return convertTextToJson(response.body);
     } else {
-      setState(() {
-        docText = 'Failed to fetch content';
-      });
+      throw Exception('Failed to fetch content');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Color(0xFFF2EE9D),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Navigation()),
-            );
-          },
-        ),
-        backgroundColor: Color(0xFF557A46),
-        title: Text(
-          '$title',
-          style: const TextStyle(
-              color: Color(0xFFF2EE9D), fontWeight: FontWeight.bold),
-        ),
-      ),
-      backgroundColor: Color(0xFF7A9D54),
-      body: jsonData.isEmpty
-          ? Center(
+      backgroundColor: const Color(0xFF7A9D54),
+      body: FutureBuilder(
+        future: _fetchGoogleDocsText,
+        builder: (context, AsyncSnapshot<List<Map<String, String>>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
               child: RefreshProgressIndicator(
                 backgroundColor: Color(0xFF557A46),
                 color: Color(0xFFF2EE9D),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: jsonData.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 5, // Add elevation for a card-like effect
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      jsonData[index]['title'] ?? '',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+            );
+          } else if (snapshot.hasError) {
+            return Container(
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 40,
+                    left: 10,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF557A46).withOpacity(0.5),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        color: const Color(0xFFF2EE9D),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Navigation()),
+                          );
+                        },
                       ),
                     ),
-                    subtitle: Text(
-                      jsonData[index]['description'] ?? '',
-                      style: TextStyle(fontSize: 16),
+                  ),
+                  const Center(
+                    child: Text(
+                      'Could not get the requested data!!',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Color(0xFFF2EE9D)),
                     ),
-                    onTap: () {
+                  ),
+                ],
+              ),
+            );
+          } else {
+            List<Map<String, String>> jsonData = snapshot.data!;
+            return Stack(
+              children: [
+                PageView.builder(
+                  itemCount: jsonData.length,
+                  itemBuilder: (context, index) {
+                    List<String> arr = [
+                      'assets/organic-farming1.jpg',
+                      'assets/organic-farming2.jpg',
+                      'assets/organic-farming3.jpg',
+                      'assets/organic-farming4.jpg',
+                      'assets/organic-farming5.jpg'
+                    ];
+                    return buildCard(context, jsonData[index], arr[index]);
+                  },
+                ),
+                Positioned(
+                  top: 40,
+                  left: 10,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF557A46).withOpacity(0.5),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFFF2EE9D),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Navigation()),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget buildCard(
+      BuildContext context, Map<String, String> data, String bgimage) {
+    return Stack(
+      children: [
+        Positioned(
+          child: Image.asset(
+            bgimage,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+        ),
+        Container(
+          color: Colors.black.withOpacity(0.5),
+          width: double.infinity,
+          height: double.infinity,
+        ),
+        Positioned(
+          bottom: 16,
+          left: 16,
+          right: 16,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data['title'] ?? '',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                data['description'] ?? '',
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              Center(
+                child: Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => FetchDriveData(
-                            title: jsonData[index]['title'] ?? '',
-                            description: jsonData[index]['description'] ?? '',
-                            link: jsonData[index]['link'] ?? '',
+                            title: data['title'] ?? '',
+                            description: data['description'] ?? '',
+                            link: data['link'] ?? '',
                           ),
                         ),
                       );
                     },
+                    child: const Text(
+                      'Read More',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color(0xFF557A46),
+                    ),
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

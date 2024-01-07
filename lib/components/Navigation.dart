@@ -4,7 +4,6 @@ import 'package:kisan/components/Get_Blogs.dart';
 import 'package:kisan/components/Fetch_Blog.dart';
 import 'package:kisan/components/Home.dart';
 import 'package:kisan/components/Profile.dart';
-import 'package:kisan/components/Web.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -105,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentIndex = index;
           });
         },
-        children: [HomePage(), WebViewApp()],
+        children: [HomePage()],
       ),
       bottomNavigationBar: supabase.auth.currentUser != null
           ? BottomNavigationBar(
