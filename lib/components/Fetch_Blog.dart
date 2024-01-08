@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class FetchDriveData extends StatefulWidget {
   final String title;
@@ -74,7 +80,35 @@ class _GoogleDriveState extends State<FetchDriveData> {
     }
   }
 
-  @override
+  Future<void> downloadPdf() async {
+    final pdf = pw.Document();
+
+    // Add content to the PDF
+    pdf.addPage(pw.Page(build: (pw.Context context) {
+      return pw.Center(
+        child: pw.Text(docHtml),
+      );
+    }));
+
+    try {
+      // Get the application documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/example.pdf';
+
+      // Save the PDF to the documents directory
+      await File(filePath).writeAsBytes(await pdf.save());
+
+      // Notify the user that the PDF has been downloaded
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('PDF downloaded successfully!'),
+        ),
+      );
+    } catch (e) {
+      print('Error saving PDF: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,6 +123,12 @@ class _GoogleDriveState extends State<FetchDriveData> {
           ),
         ),
         foregroundColor: Color(0xFFF2EE9D),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.file_download),
+            onPressed: downloadPdf,
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -103,9 +143,9 @@ class _GoogleDriveState extends State<FetchDriveData> {
           ),
           if (isLoading)
             Center(
-              child: RefreshProgressIndicator(
+              child: CircularProgressIndicator(
                 backgroundColor: Color(0xFF557A46),
-                color: Color(0xFFF2EE9D),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF2EE9D)),
               ),
             ),
         ],
