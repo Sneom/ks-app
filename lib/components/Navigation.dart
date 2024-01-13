@@ -3,6 +3,7 @@ import 'package:kisan/components/Auth.dart';
 import 'package:kisan/components/Get_Blogs.dart';
 import 'package:kisan/components/Fetch_Blog.dart';
 import 'package:kisan/components/Home.dart';
+import 'package:kisan/components/Products/agri_products.dart';
 import 'package:kisan/components/Profile.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -73,8 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF557A46),
-        title: Text(
+        backgroundColor: const Color(0xFF557A46),
+        title: const Text(
           'Kisan Sathi', // Add the heading in the center
           style: TextStyle(
             fontSize: 24.0,
@@ -86,12 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           // Add a user profile icon on the left side
           IconButton(
-            icon: Icon(Icons.account_circle),
-            color: Color(0xFFF2EE9D),
+            icon: const Icon(Icons.account_circle),
+            color: const Color(0xFFF2EE9D),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
             },
           ),
@@ -104,15 +105,15 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentIndex = index;
           });
         },
-        children: [HomePage()],
+        children: [const HomePage(), ProductListPage()],
       ),
       bottomNavigationBar: supabase.auth.currentUser != null
           ? BottomNavigationBar(
-              backgroundColor:
-                  Color(0xFF557A46), // Set the color of the navigation bar
+              backgroundColor: const Color(
+                  0xFF557A46), // Set the color of the navigation bar
 
               currentIndex: _currentIndex,
-              selectedItemColor: Color(0xFFF2EE9D),
+              selectedItemColor: const Color(0xFFF2EE9D),
               unselectedItemColor: Colors.white,
               onTap: (index) {
                 setState(() {
@@ -126,12 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(
                     Icons.home,
                   ),
-                  label: 'Home',
+                  label: 'Learn',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
-                  icon: Icon(Icons.analytics),
-                  label: 'Scheme',
+                  icon: Icon(Icons.store),
+                  label: 'Market',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
