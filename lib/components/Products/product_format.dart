@@ -7,8 +7,9 @@ class Product {
   final String state;
   final String description;
   final String date;
-  final int price;
-  final bool tosell;
+  final String price;
+  final String tosell;
+  final List<dynamic> images;
 
   Product(
       {required this.id,
@@ -19,6 +20,7 @@ class Product {
       required this.state,
       required this.date,
       required this.tosell,
+      required this.images,
       required this.description,
       required this.price});
 
@@ -31,8 +33,9 @@ class Product {
         state: json['state'],
         description: json['description'],
         price: json['price'],
+        images: json['images'],
         date: json['created_at'],
-        tosell: json['tosell'],
+        tosell: json['type'],
         email: json['email']);
   }
 
@@ -40,10 +43,11 @@ class Product {
     return Product(
       product: map['product'] as String,
       description: map['description'] as String,
-      price: map['price'] as int,
-      tosell: map['tosell'] as bool,
+      price: map['price'] as String,
+      tosell: map['type'] as String,
       name: map['name'] as String,
       date: map['created_at'],
+      images: map['images'],
       city: map['city'] as String,
       state: map['state'] as String,
       email: map['email'] as String,

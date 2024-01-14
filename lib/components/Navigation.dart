@@ -3,6 +3,7 @@ import 'package:kisan/components/Auth.dart';
 import 'package:kisan/components/Get_Blogs.dart';
 import 'package:kisan/components/Fetch_Blog.dart';
 import 'package:kisan/components/Home.dart';
+import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/agri_products.dart';
 import 'package:kisan/components/Profile.dart';
 import 'package:kisan/main.dart';
@@ -106,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
         children: [const HomePage(), ProductListPage()],
+        //children: [AddProductScreen()],
       ),
       bottomNavigationBar: supabase.auth.currentUser != null
           ? BottomNavigationBar(

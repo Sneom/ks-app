@@ -9,10 +9,10 @@ String profileImageUrl = "";
 Map<String, String> profileImageMap = {};
 Map<String, dynamic> images = {};
 
-class ProductCard extends StatelessWidget {
+class ProductCards extends StatelessWidget {
   final Product product;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCards({Key? key, required this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

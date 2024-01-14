@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/date_format.dart';
 import 'package:kisan/components/Products/product_design.dart';
 import 'package:kisan/components/Products/product_format.dart';
@@ -20,8 +21,9 @@ class _ProductListPageState extends State<ProductListPage> {
   List<Product> _filteredProducts = [];
   int _numberOfProductsToShow = 2; // Initial number of products to show
   bool _isLoading = false;
-  String city = '', state = '';
+  String city = '', state = '', email = '';
   bool _isNearMe = true;
+  bool _isMyProducts = true;
   bool _isFetchingLocation = false;
   @override
   void initState() {
@@ -64,6 +66,7 @@ class _ProductListPageState extends State<ProductListPage> {
         .select()
         .ilike('city', '%$city%')
         .ilike('state', '%$state%')
+        .ilike('email', '%$email%')
         .range(_products.length, _products.length + _numberOfProductsToShow);
 
     // Map the response data to the Product class
@@ -71,13 +74,14 @@ class _ProductListPageState extends State<ProductListPage> {
         .map<Product>((data) => Product(
               product: data['product'] as String,
               description: data['description'] as String,
-              price: data['price'] as int,
-              tosell: data['tosell'] as bool,
+              price: data['price'] as String,
+              tosell: data['type'] as String,
               name: data['name'] as String,
               date: data['created_at'],
               city: data['city'] as String,
               state: data['state'] as String,
               email: data['email'] as String,
+              images: data['images'],
               id: data['id'] as String,
             ))
         .toList();
@@ -116,7 +120,7 @@ class _ProductListPageState extends State<ProductListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF7A9D54),
+      backgroundColor: const Color(0xFF7A9D54),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -125,8 +129,6 @@ class _ProductListPageState extends State<ProductListPage> {
             pinned: true,
             shadowColor: Colors.white,
             flexibleSpace: FlexibleSpaceBar(
-              //title: const Text('Kisan Market'),
-
               background: Container(
                 decoration: const BoxDecoration(color: Color(0xFF7A9D54)),
                 child: Padding(
@@ -137,62 +139,105 @@ class _ProductListPageState extends State<ProductListPage> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 240, 240, 240),
+                            color: const Color.fromARGB(255, 240, 240, 240),
                             borderRadius: BorderRadius.circular(100.0),
                           ),
-                          child: TextField(
-                            cursorColor: Color(0xFF7A9D54),
-                            controller: _searchController,
-                            onChanged: _searchProducts,
-                            decoration: const InputDecoration(
-                              hintText: 'Search Products...',
-                              fillColor: Colors.white,
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 14.0,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.search,
-                                color: Color(0xFF7A9D54),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      if (_isFetchingLocation == false)
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _isNearMe = !_isNearMe;
-                            });
-                            _isNearMe
-                                ? _showProductsNotNearMe()
-                                : _showProductsNearMe();
-                          },
-                          child: Text(
-                            _isNearMe ? 'Near Me' : 'Not Near Me',
-                            style: TextStyle(color: Color(0xFF557A46)),
-                          ),
-                        ),
-                      if (_isFetchingLocation)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Row(
                             children: [
-                              Text('Fetching Location'),
-                              SizedBox(width: 8.0),
-                              CircularProgressIndicator(
-                                backgroundColor: Color(0xFF557A46),
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xFFF2EE9D)),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.0, vertical: 14.0),
+                                child: Icon(
+                                  Icons.search,
+                                  color: Color(0xFF7A9D54),
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  cursorColor: const Color(0xFF7A9D54),
+                                  controller: _searchController,
+                                  onChanged: _searchProducts,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search Products...',
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                width: 100,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isMyProducts = !_isMyProducts;
+                                    });
+                                    _isMyProducts
+                                        ? _showAllProducts()
+                                        : _showMyProducts();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: const Color(0xFFF2EE9D),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                  ),
+                                  child: Text(
+                                    _isMyProducts
+                                        ? 'My Products'
+                                        : 'All Products',
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              if (_isFetchingLocation == false)
+                                SizedBox(
+                                  width: 100,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _isNearMe = !_isNearMe;
+                                      });
+                                      _isNearMe
+                                          ? _showProductsNotNearMe()
+                                          : _showProductsNearMe();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: const Color(0xFFF2EE9D),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                    ),
+                                    child: Text(
+                                      _isNearMe ? 'Near Me' : 'Not Near Me',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                ),
+                              if (_isFetchingLocation)
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Text('Fetching Location'),
+                                      SizedBox(width: 8.0),
+                                      CircularProgressIndicator(
+                                        backgroundColor: Color(0xFF557A46),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Color(0xFFF2EE9D)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(
+                                width: 8,
                               ),
                             ],
                           ),
                         ),
+                      ),
                     ],
                   ),
                 ),
@@ -239,11 +284,25 @@ class _ProductListPageState extends State<ProductListPage> {
         backgroundColor: const Color(0xFF557A46),
         foregroundColor: Colors.white,
         onPressed: () {
-          // Navigate to add product screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AddProductScreen()),
+          );
         },
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  void _showMyProducts() {
+    final user = supabase.auth.currentUser;
+    email = user!.email!;
+    _refreshProducts();
+  }
+
+  void _showAllProducts() {
+    email = '';
+    _refreshProducts();
   }
 
   void _showProductsNotNearMe() {
