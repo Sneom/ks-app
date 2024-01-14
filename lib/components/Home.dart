@@ -6,50 +6,59 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF7A9D54),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
-            // crossAxisAlignment: CrossAxisAlignment.stretch, // Remove this line
-            children: [
-              // Text(
-              //   "Learn Farming Methods",
-              //   style: TextStyle(
-              //       fontSize: 25,
-              //       fontWeight: FontWeight.bold,
-              //       color: Colors.white),
-              // ),
-              SizedBox(height: 16),
-              ClickableCategoryCard(
-                icon: Icons.eco,
-                title: 'Organic Farming',
-                description: 'Explore sustainable farming practices.',
-              ),
-              SizedBox(height: 16),
-              ClickableCategoryCard(
-                icon: Icons.pets,
-                title: 'Animal Husbandry',
-                description: 'Learn about livestock and animal care.',
-              ),
-              SizedBox(height: 16),
-              ClickableCategoryCard(
-                icon: Icons.local_florist,
-                title: 'Nourishment Garden',
-                description: 'Create a beautiful and healthy garden.',
-              ),
-              SizedBox(height: 16),
-              ClickableCategoryCard(
-                icon: Icons.food_bank,
-                title: 'Food Processing',
-                description:
-                    'Discover methods of food preservation and processing.',
-              ),
+    return DefaultTabController(
+      length: 12,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Farmers Hub"),
+          backgroundColor: Colors.green[600], // Use earthy green color
+          bottom: TabBar(
+            isScrollable: true,
+            indicatorColor: Colors.white,
+            tabs: [
+              Tab(text: 'Sustainable Farming'),
+              Tab(text: 'Livestock Care'),
+              Tab(text: 'Garden Cultivation'),
+              Tab(text: 'Food Preservation'),
+              Tab(text: 'Buying and Selling'),
+              Tab(text: 'Bank'),
+              Tab(text: 'Daily Wages Workers'),
+              Tab(text: 'Weather'),
+              Tab(text: 'Farmers Scheme'),
+              Tab(text: 'Tourism on Farming'),
+              Tab(text: 'Success Stories'),
+              Tab(text: 'Feedback'),
             ],
           ),
+        ),
+        backgroundColor: Color(0xFFE6E6E6),
+        body: TabBarView(
+          children: [
+            ClickableCategoryCard(
+              icon: Icons.spa,
+              title: 'Organic Farming',
+              description: 'Explore sustainable farming practices.',
+            ),
+            ClickableCategoryCard(
+              icon: Icons.pets,
+              title: 'Livestock Care',
+              description: 'Learn about livestock and animal husbandry.',
+            ),
+            ClickableCategoryCard(
+              icon: Icons.eco_outlined,
+              title: 'Garden Cultivation',
+              description: 'Create a beautiful and nourishing garden.',
+            ),
+            ClickableCategoryCard(
+              icon: Icons.food_bank,
+              title: 'Food Preservation',
+              description:
+                  'Discover methods of food preservation and processing.',
+            ),
+            // Add more ClickableCategoryCard widgets for other tabs
+            // ...
+            // Make sure to provide the relevant data for each category
+          ],
         ),
       ),
     );
@@ -77,57 +86,45 @@ class ClickableCategoryCard extends StatelessWidget {
           MaterialPageRoute(builder: (context) => GetBlogs(title: title)),
         );
       },
-      child: CategoryCard(
-        icon: icon,
-        title: title,
-        description: description,
-      ),
-    );
-  }
-}
-
-class CategoryCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-
-  const CategoryCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Icon(icon, size: 48, color: Colors.green),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Icon(icon, size: 48, color: Colors.green),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        description,
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(description),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
