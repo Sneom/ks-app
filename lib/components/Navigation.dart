@@ -17,25 +17,19 @@ class Navigation extends StatelessWidget {
   }
 }
 
-bool isAdmin = false;
-
 class AuthChecker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<User?>(
-      // Check if a user is already authenticated
       future: Future.value(supabase.auth.currentUser),
       builder: (context, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData && snapshot.data != null) {
-            // User is signed in, navigate to HomePage
             return MyHomePage();
           } else {
-            // User is not signed in, navigate to SignInPage
             return AuthPage();
           }
         } else {
-          // Still loading authentication status
           return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
@@ -55,12 +49,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   late PageController _pageController;
-  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
-
     _pageController = PageController(initialPage: _currentIndex);
   }
 
@@ -74,21 +66,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF557A46),
+        backgroundColor: const Color(0xFF7A9D54), // Earthy green color
         title: const Text(
-          'Kisan Sathi', // Add the heading in the center
+          'Kisan Sathi',
           style: TextStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.bold,
-            color: Color(0xFFF2EE9D),
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         actions: [
-          // Add a user profile icon on the left side
           IconButton(
             icon: const Icon(Icons.account_circle),
-            color: const Color(0xFFF2EE9D),
+            color: Colors.white,
             onPressed: () {
               Navigator.push(
                 context,
@@ -109,12 +100,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: supabase.auth.currentUser != null
           ? BottomNavigationBar(
-              backgroundColor: const Color(
-                  0xFF557A46), // Set the color of the navigation bar
-
+              backgroundColor: const Color(0xFF7A9D54), // Earthy green color
               currentIndex: _currentIndex,
-              selectedItemColor: const Color(0xFFF2EE9D),
-              unselectedItemColor: Colors.white,
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white54,
               onTap: (index) {
                 setState(() {
                   _currentIndex = index;
@@ -123,30 +112,30 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               items: const [
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF557A46),
+                  backgroundColor: Color(0xFF7A9D54),
                   icon: Icon(
                     Icons.home,
                   ),
                   label: 'Learn',
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF557A46),
+                  backgroundColor: Color(0xFF7A9D54),
                   icon: Icon(Icons.store),
                   label: 'Market',
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF557A46),
+                  backgroundColor: Color(0xFF7A9D54),
                   icon: Icon(Icons.cloud),
                   label: 'Weather',
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF557A46),
+                  backgroundColor: Color(0xFF7A9D54),
                   icon: Icon(Icons.feedback),
                   label: 'Feedback',
                 )
               ],
             )
-          : null, // Set to null to hide the bottom navigation bar
+          : null,
     );
   }
 }
