@@ -1,8 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
-import 'package:kisan/components/Fetch_Blog.dart';
+import 'package:intl/intl.dart';
 import 'package:kisan/components/Navigation.dart';
+import 'package:kisan/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+// import 'package:flutter_html/flutter_html.dart';
 
 class GetBlogs extends StatelessWidget {
   final String title;
@@ -12,22 +19,22 @@ class GetBlogs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: GoogleDrive(title: title),
+      home: SupabaseBlogs(title: title),
     );
   }
 }
 
-class GoogleDrive extends StatefulWidget {
+class SupabaseBlogs extends StatefulWidget {
   final String title;
 
-  const GoogleDrive({Key? key, required this.title}) : super(key: key);
+  const SupabaseBlogs({Key? key, required this.title}) : super(key: key);
 
   @override
-  _GoogleDriveState createState() => _GoogleDriveState();
+  _SupabaseBlogsState createState() => _SupabaseBlogsState();
 }
 
-class _GoogleDriveState extends State<GoogleDrive> {
-  late Future<List<Map<String, String>>> _fetchGoogleDocsText;
+class _SupabaseBlogsState extends State<SupabaseBlogs> {
+  late Future<List<Map<String, dynamic>>> _fetchSupabaseBlogs;
   late PageController _pageController;
   int _currentPage = 0;
   TextEditingController _noteController = TextEditingController();
@@ -36,7 +43,7 @@ class _GoogleDriveState extends State<GoogleDrive> {
   @override
   void initState() {
     super.initState();
-    _fetchGoogleDocsText = fetchGoogleDocsText();
+    _fetchSupabaseBlogs = fetchSupabaseBlogs();
     _pageController = PageController();
 
     // Load saved notes during widget initialization
@@ -59,20 +66,18 @@ class _GoogleDriveState extends State<GoogleDrive> {
     prefs.setStringList(title, _notes);
   }
 
-  Future<List<Map<String, String>>> fetchGoogleDocsText() async {
-    String link = '';
-    if (widget.title.toLowerCase() == 'organic farming') {
-      link =
-          'https://docs.google.com/document/d/1TAopV6MvmqEmEttnW0gB32IYtMcDb4vW_yKV9i1sIvg/export?format=txt';
+  Future<List<Map<String, dynamic>>> fetchSupabaseBlogs() async {
+    final response = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('category', widget.title)
+        .order('created_at', ascending: false);
+
+    if (response.isEmpty) {
+      throw Exception('Failed to fetch content from Supabase');
     }
 
-    final response = await http.get(Uri.parse(link));
-
-    if (response.statusCode == 200) {
-      return convertTextToJson(response.body);
-    } else {
-      throw Exception('Failed to fetch content');
-    }
+    return response as List<Map<String, dynamic>>;
   }
 
   Future<bool> checkIfRead(String title) async {
@@ -90,8 +95,8 @@ class _GoogleDriveState extends State<GoogleDrive> {
     return Scaffold(
       backgroundColor: const Color(0xFF7A9D54),
       body: FutureBuilder(
-        future: _fetchGoogleDocsText,
-        builder: (context, AsyncSnapshot<List<Map<String, String>>> snapshot) {
+        future: _fetchSupabaseBlogs,
+        builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(
@@ -118,7 +123,9 @@ class _GoogleDriveState extends State<GoogleDrive> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Navigation(),
+                              builder: (context) => Navigation(
+                                page: 0,
+                              ),
                             ),
                           );
                         },
@@ -140,7 +147,7 @@ class _GoogleDriveState extends State<GoogleDrive> {
               ),
             );
           } else {
-            List<Map<String, String>> jsonData = snapshot.data!;
+            List<Map<String, dynamic>> jsonData = snapshot.data!;
             return Stack(
               children: [
                 AnimatedBuilder(
@@ -188,7 +195,9 @@ class _GoogleDriveState extends State<GoogleDrive> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Navigation(),
+                            builder: (context) => Navigation(
+                              page: 0,
+                            ),
                           ),
                         );
                       },
@@ -210,28 +219,7 @@ class _GoogleDriveState extends State<GoogleDrive> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _showNoteDialog(
-                                context, jsonData[_currentPage]['title'] ?? '');
-                          },
-                          child: Text(
-                            'Add Note',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            primary: const Color(0xFF557A46),
-                          ),
-                        ),
-                      ),
                       SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        child: _buildNotesList(
-                            jsonData[_currentPage]['title'] ?? ''),
-                      ),
                     ],
                   ),
                 ),
@@ -243,150 +231,15 @@ class _GoogleDriveState extends State<GoogleDrive> {
     );
   }
 
-  Widget _buildNotesList(String title) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Notes for "$title":',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        SizedBox(height: 8),
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _notes
-                .map((note) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          note,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                _showEditNoteDialog(context, title, note);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () {
-                                _deleteNote(title, note);
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ))
-                .toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showNoteDialog(BuildContext context, String title) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add Note'),
-          content: TextField(
-            controller: _noteController,
-            decoration: InputDecoration(labelText: 'Enter your note'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _notes.add(_noteController.text);
-                  _noteController.clear();
-                });
-                _saveNotes(title); // Save notes when adding a new note
-                Navigator.pop(context);
-              },
-              child: Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showEditNoteDialog(BuildContext context, String title, String note) {
-    _noteController.text = note;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit Note'),
-          content: TextField(
-            controller: _noteController,
-            decoration: InputDecoration(labelText: 'Edit your note'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  int index = _notes.indexOf(note);
-                  _notes[index] = _noteController.text;
-                  _noteController.clear();
-                });
-                _saveNotes(title); // Save notes when editing a note
-                Navigator.pop(context);
-              },
-              child: Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteNote(String title, String note) {
-    setState(() {
-      _notes.remove(note);
-    });
-    _saveNotes(title); // Save notes when deleting a note
-  }
-
-  Widget buildCard(BuildContext context, Map<String, String> data, bool isRead,
+  Widget buildCard(BuildContext context, Map<String, dynamic> data, bool isRead,
       String note) {
+    String _formatDateTime(String dateTimeString) {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('dd MMM yyyy').format(dateTime);
+    }
+
     return Stack(
       children: [
-        // Positioned(
-        //   child: Image.asset(
-        //     bgimage,
-        //     fit: BoxFit.cover,
-        //     width: double.infinity,
-        //     height: double.infinity,
-        //   ),
-        // ),
         Container(
           color: Colors.black.withOpacity(0.5),
           width: double.infinity,
@@ -414,15 +267,13 @@ class _GoogleDriveState extends State<GoogleDrive> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
-                  //color: isRead ? Color(0xFFF2EE9D) : Colors.white,
                 ),
               ),
               Text(
-                "Created: ${data['created']}" ?? '',
+                "Created: ${_formatDateTime(data['created_at'])}" ?? '',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
-                  //color: isRead ? Color(0xFFF2EE9D) : Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -444,15 +295,12 @@ class _GoogleDriveState extends State<GoogleDrive> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FetchDriveData(
-                            title: data['title'] ?? '',
-                            description: data['description'] ?? '',
-                            link: data['link'] ?? '',
-                          ),
+                          builder: (context) => BlogContentWidget(
+                              htmlContent: data['content'] ?? ''),
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'Read More',
                       style: TextStyle(color: Colors.white),
                     ),
@@ -468,32 +316,34 @@ class _GoogleDriveState extends State<GoogleDrive> {
       ],
     );
   }
+}
 
-  List<Map<String, String>> convertTextToJson(String text) {
-    List<String> lines = text.split('\n');
-    List<Map<String, String>> jsonData = [];
-    Map<String, String> currentEntry = {};
+class BlogContentWidget extends StatelessWidget {
+  final String htmlContent;
 
-    for (String line in lines) {
-      line = line.trim();
-      if (line.isNotEmpty) {
-        if (line.startsWith('"title"')) {
-          currentEntry = {
-            'title': line.split(':')[1].trim().replaceAll('"', ''),
-          };
-        } else if (line.startsWith('"created"')) {
-          currentEntry['created'] =
-              line.split(':')[1].trim().replaceAll('"', '');
-        } else if (line.startsWith('"description"')) {
-          currentEntry['description'] =
-              line.split(':')[1].trim().replaceAll('"', '');
-        } else if (line.startsWith('"link"')) {
-          currentEntry['link'] = line.split(': ')[1].trim().replaceAll('"', '');
-          jsonData.add(currentEntry);
-        }
-      }
-    }
+  const BlogContentWidget({Key? key, required this.htmlContent})
+      : super(key: key);
 
-    return jsonData;
+  @override
+  Widget build(BuildContext context) {
+    print("ASDASDASDADS $htmlContent");
+    return Scaffold(
+      appBar: AppBar(
+          // title: Text('Blog Content'),
+          ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 15, 8, 8),
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.diagonal3Values(1.0, 1.0, 1.0),
+            child: HtmlWidget(
+              htmlContent,
+              textStyle: TextStyle(fontSize: 8.0, color: Colors.black),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

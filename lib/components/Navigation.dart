@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Auth.dart';
 import 'package:kisan/components/Get_Blogs.dart';
-import 'package:kisan/components/Fetch_Blog.dart';
 import 'package:kisan/components/Home.dart';
 import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/agri_products.dart';
@@ -11,14 +10,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Navigation extends StatelessWidget {
   @override
+  final int page;
+
+  const Navigation({Key? key, required this.page}) : super(key: key);
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AuthChecker(),
+      home: AuthChecker(
+        page: page,
+      ),
     );
   }
 }
 
 class AuthChecker extends StatelessWidget {
+  final int page;
+
+  const AuthChecker({Key? key, required this.page}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<User?>(
@@ -26,7 +33,9 @@ class AuthChecker extends StatelessWidget {
       builder: (context, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData && snapshot.data != null) {
-            return MyHomePage();
+            return MyHomePage(
+              page: page,
+            );
           } else {
             return AuthPage();
           }
@@ -43,17 +52,24 @@ class AuthChecker extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  final int page;
+
+  const MyHomePage({Key? key, required this.page}) : super(key: key);
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState(page: page);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final int page;
+
+  _MyHomePageState({required this.page});
   int _currentIndex = 0;
   late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = page;
     _pageController = PageController(initialPage: _currentIndex);
   }
 
@@ -67,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF7A9D54), // Earthy green color
+        backgroundColor: const Color(0xFF557A46), // Earthy green color
         title: const Text(
           'Kisan Sathi',
           style: TextStyle(
@@ -102,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: supabase.auth.currentUser != null
           ? BottomNavigationBar(
-              backgroundColor: const Color(0xFF7A9D54), // Earthy green color
+              backgroundColor: const Color(0xFF557A46), // Earthy green color
               currentIndex: _currentIndex,
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.white54,
@@ -114,24 +130,24 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               items: const [
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF7A9D54),
+                  backgroundColor: Color(0xFF557A46),
                   icon: Icon(
                     Icons.home,
                   ),
                   label: 'Learn',
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF7A9D54),
+                  backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.store),
                   label: 'Market',
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF7A9D54),
+                  backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.cloud),
                   label: 'Weather',
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: Color(0xFF7A9D54),
+                  backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.feedback),
                   label: 'Feedback',
                 )

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kisan/components/Products/agri_products.dart';
+import 'package:kisan/components/Navigation.dart';
 import 'package:kisan/main.dart';
 import 'dart:io';
 import 'package:supabase/supabase.dart';
@@ -85,7 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => ProductListPage()),
+      MaterialPageRoute(
+          builder: (context) => Navigation(
+                page: 1,
+              )),
     );
 
     if (response.error != null) {
@@ -111,7 +114,10 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => ProductListPage()),
+              MaterialPageRoute(
+                  builder: (context) => Navigation(
+                        page: 1,
+                      )),
             );
           },
         ),

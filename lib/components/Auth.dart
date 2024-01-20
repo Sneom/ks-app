@@ -23,7 +23,9 @@ class AuthPage extends StatelessWidget {
                     ConnectionState.done) {
                   if (userRecordSnapshot.data == true) {
                     // User record exists, navigate to HomePage
-                    return Navigation();
+                    return Navigation(
+                      page: 0,
+                    );
                   } else {
                     // User record does not exist, navigate to GetData page
                     return GetLanguagePage();
