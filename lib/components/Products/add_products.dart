@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kisan/components/Navigation.dart';
 import 'package:kisan/main.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:supabase/supabase.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class AddProductScreen extends StatelessWidget {
   @override
@@ -41,12 +43,35 @@ class _MyHomePageState extends State<MyHomePage> {
   };
   Future<void> getImages() async {
     List<XFile> selectedImages = await picker.pickMultiImage();
+
     print(
         "Selected Images: ${selectedImages.map((image) => image.path).toList()}");
 
+    List<File> compressedImages = [];
+
+    for (int i = 0; i < selectedImages.length; i++) {
+      // Compress the image before adding it to the list
+      File compressedImage = await _compressImage(selectedImages[i].path);
+      compressedImages.add(compressedImage);
+    }
+
     setState(() {
-      images = selectedImages.map((image) => File(image.path)).toList();
+      images = compressedImages;
     });
+  }
+
+  Future<File> _compressImage(String imagePath) async {
+    final List<int> bytes = (await FlutterImageCompress.compressWithFile(
+      imagePath,
+      quality: 80, // Adjust the quality as needed (0 to 100)
+    )) as List<int>;
+
+    final String path = imagePath.split('/').last;
+    final File compressedImage =
+        File('${(await getTemporaryDirectory()).path}/$path');
+    await compressedImage.writeAsBytes(bytes);
+
+    return compressedImage;
   }
 
   Future<void> uploadImagesAndSubmit() async {

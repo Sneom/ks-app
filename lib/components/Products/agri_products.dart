@@ -67,6 +67,7 @@ class _ProductListPageState extends State<ProductListPage> {
         .ilike('city', '%$city%')
         .ilike('state', '%$state%')
         .ilike('email', '%$email%')
+        .order('created_at', ascending: false)
         .range(_products.length, _products.length + _numberOfProductsToShow);
 
     // Map the response data to the Product class

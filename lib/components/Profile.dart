@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Auth.dart';
+import 'package:kisan/components/Get_Language.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,7 +14,7 @@ class ProfilePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF7A9D54), // Updated app bar color
+        backgroundColor: const Color(0xFF7A9D54),
         title: const Text(
           'My Farm Profile',
           style: TextStyle(
@@ -24,7 +25,7 @@ class ProfilePage extends StatelessWidget {
         ),
         foregroundColor: Colors.white,
       ),
-      backgroundColor: const Color(0xFFF2EE9D), // Updated background color
+      backgroundColor: const Color(0xFFF2EE9D),
       body: ListView(
         children: [
           ListTile(
@@ -55,8 +56,7 @@ class ProfilePage extends StatelessWidget {
           ListTile(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            leading: const Icon(Icons.agriculture,
-                color: Color(0xFF34495E)), // Updated icon
+            leading: const Icon(Icons.agriculture, color: Color(0xFF34495E)),
             title: const Text(
               'Farm Settings',
               style: TextStyle(
@@ -85,6 +85,27 @@ class ProfilePage extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => AuthPage()),
+              );
+            },
+          ),
+          const Divider(color: Color(0xFFBDC3C7)),
+          ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            leading: const Icon(Icons.language, color: Color(0xFF34495E)),
+            title: const Text(
+              'Change Language',
+              style: TextStyle(
+                color: Color(0xFF2C3E50),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            onTap: () {
+              // Navigate to language change page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GetLanguagePage()),
               );
             },
           ),
