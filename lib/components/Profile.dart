@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Auth.dart';
 import 'package:kisan/components/Get_Language.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  String selectedLanguage;
+
+  ProfilePage({Key? key, required this.selectedLanguage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final user = supabase.auth.currentUser;
     final profilePictureUrl = user?.userMetadata?['avatar_url'] ?? '';
-
+    Map<String, String> titles =
+        LanguageTexts.profileTitles[selectedLanguage] ?? {};
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF7A9D54),
-        title: const Text(
-          'My Farm Profile',
+        title: Text(
+          '${titles['profile']}',
           style: TextStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.bold,
@@ -57,8 +61,8 @@ class ProfilePage extends StatelessWidget {
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             leading: const Icon(Icons.agriculture, color: Color(0xFF34495E)),
-            title: const Text(
-              'Farm Settings',
+            title: Text(
+              '${titles['settings']}',
               style: TextStyle(
                   color: Color(0xFF2C3E50),
                   fontSize: 16,
@@ -72,29 +76,9 @@ class ProfilePage extends StatelessWidget {
           ListTile(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            leading: const Icon(Icons.logout, color: Color(0xFF34495E)),
-            title: const Text(
-              'Logout',
-              style: TextStyle(
-                  color: Color(0xFF2C3E50),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
-            ),
-            onTap: () async {
-              await supabase.auth.signOut();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => AuthPage()),
-              );
-            },
-          ),
-          const Divider(color: Color(0xFFBDC3C7)),
-          ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             leading: const Icon(Icons.language, color: Color(0xFF34495E)),
-            title: const Text(
-              'Change Language',
+            title: Text(
+              '${titles['changeLanguage']}',
               style: TextStyle(
                 color: Color(0xFF2C3E50),
                 fontSize: 16,
@@ -106,6 +90,26 @@ class ProfilePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => GetLanguagePage()),
+              );
+            },
+          ),
+          const Divider(color: Color(0xFFBDC3C7)),
+          ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            leading: const Icon(Icons.logout, color: Color(0xFF34495E)),
+            title: Text(
+              '${titles['logout']}',
+              style: TextStyle(
+                  color: Color(0xFF2C3E50),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            onTap: () async {
+              await supabase.auth.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => AuthPage()),
               );
             },
           ),

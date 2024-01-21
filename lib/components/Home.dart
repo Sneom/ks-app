@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Get_Blogs.dart';
+import 'package:kisan/components/Get_Language.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/main.dart';
-import 'package:supabase/supabase.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,12 +14,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String selectedLanguage = '';
   List<Map<String, dynamic>> weatherData = [];
 
   @override
   void initState() {
     super.initState();
+    _loadSelectedLanguage();
     fetchWeatherData();
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    });
+
+    if (selectedLanguage == '') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => GetLanguagePage()),
+      );
+    }
   }
 
   Future<void> fetchWeatherData() async {
@@ -38,6 +56,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> categoryTexts =
+        LanguageTexts.categoryTexts[selectedLanguage] ?? {};
+
+    Map<String, String> defaultTexts =
+        LanguageTexts.categoryTexts['english'] ?? {};
+
     return Scaffold(
       backgroundColor: const Color(0xFF7A9D54),
       body: Padding(
@@ -47,32 +71,42 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const ClickableCategoryCard(
+              ClickableCategoryCard(
                 icon: Icons.eco,
-                title: 'Organic Farming',
-                description: 'Explore sustainable farming practices.',
+                engTitle: '${defaultTexts['organicfarming']}',
+                title: '${categoryTexts['organicfarming']}' ?? '',
+                description: categoryTexts['explore'] ?? '',
+                selectedLanguage: selectedLanguage,
               ),
               const SizedBox(height: 16),
-              const ClickableCategoryCard(
+              ClickableCategoryCard(
                 icon: Icons.pets,
-                title: 'Animal Husbandry',
-                description: 'Learn about livestock and animal care.',
+                engTitle: '${defaultTexts['animalhusbandry']}',
+                title: '${categoryTexts['animalhusbandry']}' ?? '',
+                description: categoryTexts['learn'] ?? '',
+                selectedLanguage: selectedLanguage,
               ),
               const SizedBox(height: 16),
-              const ClickableCategoryCard(
+              ClickableCategoryCard(
                 icon: Icons.local_florist,
-                title: 'Nourishment Garden',
-                description: 'Create a beautiful and healthy garden.',
+                engTitle: '${defaultTexts['nourishmentgarden']}',
+                title: '${categoryTexts['nourishmentgarden']}' ?? '',
+                description: categoryTexts['create'] ?? '',
+                selectedLanguage: selectedLanguage,
               ),
               const SizedBox(height: 16),
-              const ClickableCategoryCard(
+              ClickableCategoryCard(
                 icon: Icons.food_bank,
-                title: 'Food Processing',
-                description:
-                    'Discover methods of food preservation and processing.',
+                engTitle: '${defaultTexts['foodprocessing']}',
+                title: '${categoryTexts['foodprocessing']}' ?? '',
+                description: categoryTexts['discover'] ?? '',
+                selectedLanguage: selectedLanguage,
               ),
               const SizedBox(height: 16),
-              WeatherInformationWidget(weatherData: weatherData),
+              WeatherInformationWidget(
+                weatherData: weatherData,
+                categoryTexts: categoryTexts,
+              ),
             ],
           ),
         ),
@@ -83,8 +117,10 @@ class _HomePageState extends State<HomePage> {
 
 class WeatherInformationWidget extends StatelessWidget {
   final List<Map<String, dynamic>> weatherData;
+  Map<String, String> categoryTexts;
 
-  WeatherInformationWidget({required this.weatherData});
+  WeatherInformationWidget(
+      {required this.weatherData, required this.categoryTexts});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +129,8 @@ class WeatherInformationWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => WeatherDetailScreen(weatherData: weatherData),
+            builder: (context) => WeatherDetailScreen(
+                weatherData: weatherData, categoryTexts: categoryTexts),
           ),
         );
       },
@@ -116,18 +153,18 @@ class WeatherInformationWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Today\'s Weather',
-                      style: TextStyle(
+                      '${categoryTexts['todaysweather']}',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    Icon(Icons.arrow_forward, color: Colors.white),
+                    const Icon(Icons.arrow_forward, color: Colors.white),
                   ],
                 ),
                 if (weatherData.isNotEmpty)
@@ -155,9 +192,9 @@ class WeatherInformationWidget extends StatelessWidget {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              const TextSpan(
-                                text: 'Temperature: ',
-                                style: TextStyle(
+                              TextSpan(
+                                text: '${categoryTexts['temperature']} : ',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -175,9 +212,9 @@ class WeatherInformationWidget extends StatelessWidget {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              const TextSpan(
-                                text: 'Chance of Rain: ',
-                                style: TextStyle(
+                              TextSpan(
+                                text: '${categoryTexts['chanceofrain']} : ',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -195,9 +232,9 @@ class WeatherInformationWidget extends StatelessWidget {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              const TextSpan(
-                                text: 'Wind Speed: ',
-                                style: TextStyle(
+                              TextSpan(
+                                text: '${categoryTexts['windspeed']} : ',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -212,9 +249,9 @@ class WeatherInformationWidget extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          "Todays Tip",
-                          style: TextStyle(
+                        Text(
+                          '${categoryTexts['todaystip']}',
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white),
@@ -251,11 +288,14 @@ class ClickableCategoryCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
-
+  final String selectedLanguage;
+  final String engTitle;
   const ClickableCategoryCard({
     required this.icon,
     required this.title,
     required this.description,
+    required this.selectedLanguage,
+    required this.engTitle,
     Key? key,
   }) : super(key: key);
 
@@ -265,13 +305,14 @@ class ClickableCategoryCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => GetBlogs(title: title)),
+          MaterialPageRoute(builder: (context) => GetBlogs(title: engTitle)),
         );
       },
       child: CategoryCard(
         icon: icon,
         title: title,
         description: description,
+        selectedLanguage: selectedLanguage,
       ),
     );
   }
@@ -281,11 +322,13 @@ class CategoryCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
+  final String selectedLanguage;
 
   const CategoryCard({
     required this.icon,
     required this.title,
     required this.description,
+    required this.selectedLanguage,
     Key? key,
   }) : super(key: key);
 
@@ -327,8 +370,9 @@ class CategoryCard extends StatelessWidget {
 
 class WeatherDetailScreen extends StatelessWidget {
   final List<Map<String, dynamic>> weatherData;
+  Map<String, String> categoryTexts;
 
-  WeatherDetailScreen({required this.weatherData});
+  WeatherDetailScreen({required this.weatherData, required this.categoryTexts});
 
   String formatTime(String time) {
     DateTime dummyDate = DateTime.parse('2024-01-01 $time');
@@ -339,7 +383,10 @@ class WeatherDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weather Details'),
+        title: Text(
+          '${categoryTexts['todaysweather']}',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color(0xFF438C6E), // Adjusted color
         foregroundColor: Colors.white,
       ),
@@ -370,24 +417,24 @@ class WeatherDetailScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildCardItem('Temperature',
+                          buildCardItem('${categoryTexts['temperature']}',
                               '${data['temperature']}°C', Icons.thermostat),
-                          buildCardItem('Sunrise',
+                          buildCardItem('${categoryTexts['sunrise']}',
                               '${formatTime(data['sunrise'])}', Icons.sunny),
-                          buildCardItem('Sunset',
+                          buildCardItem('${categoryTexts['sunset']}',
                               '${formatTime(data['sunset'])}', Icons.wb_sunny),
-                          buildCardItem('Wind Speed',
+                          buildCardItem('${categoryTexts['windspeed']}',
                               '${data['wind_speed']} km/hr', Icons.speed),
-                          buildCardItem('Wind Direction',
+                          buildCardItem('${categoryTexts['winddirection']}',
                               '${data['wind_direction']}', Icons.explore),
-                          buildCardItem(
-                              'Humidity', '${data['humidity']}%', Icons.water),
-                          buildCardItem(
-                              'Weather', '${data['weather']}', Icons.cloud),
-                          buildCardItem('Rain Chances',
+                          buildCardItem('${categoryTexts['humidity']}',
+                              '${data['humidity']}%', Icons.water),
+                          buildCardItem('${categoryTexts['weather']}',
+                              '${data['weather']}', Icons.cloud),
+                          buildCardItem('${categoryTexts['chanceofrain']}',
                               '${data['rain_chances']}%', Icons.beach_access),
-                          buildCardItem(
-                              'Tip', '${data['tip']}', Icons.lightbulb),
+                          buildCardItem('${categoryTexts['todaystip']}',
+                              '${data['tip']}', Icons.lightbulb),
                         ],
                       ),
                     ),

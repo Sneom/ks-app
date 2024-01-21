@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kisan/components/Auth.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatelessWidget {
   @override
@@ -23,9 +25,28 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   String authStatus = '';
   bool isLoading = false;
+  String selectedLanguage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSelectedLanguage();
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    });
+    if (selectedLanguage == '') {
+      selectedLanguage = 'english';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> titles =
+        LanguageTexts.headerTitle[selectedLanguage] ?? {};
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 6, 31, 44),
       body: Center(
@@ -34,23 +55,23 @@ class _SignInPageState extends State<SignInPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Kisan Sathi",
+                Text(
+                  "${titles['kisansathi']}",
                   style: TextStyle(
                     color: Colors.green,
                     fontSize: 64,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Text(
-                  "Siddhigiri Krishi Vigyan Kendra",
+                Text(
+                  "${titles['siddhigiri']}",
                   style: TextStyle(
                     color: Colors.lightGreen,
                   ),
                 ),
                 const SizedBox(height: 90),
-                const Text(
-                  "Log In To Continue",
+                Text(
+                  "${titles['login']}",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -68,7 +89,7 @@ class _SignInPageState extends State<SignInPage> {
                     padding: EdgeInsets.all(20),
                   ),
                   icon: Image.asset('assets/google_logo.webp', height: 30),
-                  label: Text('Login using Google',
+                  label: Text("${titles['logingoogle']}",
                       style: TextStyle(fontSize: 18)),
                 ),
                 SizedBox(height: 15),

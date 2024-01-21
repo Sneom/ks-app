@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/components/Navigation.dart';
 import 'package:kisan/components/Products/date_format.dart';
 import 'package:kisan/components/Products/product_format.dart';
 import 'package:kisan/main.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 String profileImageUrl = "";
 Map<String, String> profileImageMap = {};
@@ -21,11 +23,21 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   late PageController pageController;
   int currentPage = 0;
+  String selectedLanguage = '';
 
   @override
   void initState() {
     super.initState();
+    _loadSelectedLanguage();
+
     pageController = PageController();
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    });
   }
 
   @override
@@ -33,7 +45,8 @@ class _ProductCardState extends State<ProductCard> {
     final user = supabase.auth.currentUser;
     String formattedDate = formatDate(widget.product.date);
     fetchProfile(widget.product.email);
-
+    Map<String, String> titles =
+        LanguageTexts.marketTexts[selectedLanguage] ?? {};
     return Card(
       elevation: 3,
       margin: const EdgeInsets.all(8),
@@ -93,7 +106,7 @@ class _ProductCardState extends State<ProductCard> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Price: ₹${widget.product.price}',
+              '${titles['price']}: ₹${widget.product.price}',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -107,7 +120,7 @@ class _ProductCardState extends State<ProductCard> {
             ),
             const SizedBox(height: 8),
             Text(
-              "${widget.product.city}, ${widget.product.state}",
+              "${titles[widget.product.city]}, ${titles[widget.product.state]}",
               style: const TextStyle(
                 fontSize: 16,
               ),
@@ -232,7 +245,7 @@ class _ProductCardState extends State<ProductCard> {
                   foregroundColor: Colors.white,
                   textStyle: const TextStyle(fontSize: 16),
                 ),
-                child: const Text('Buy Now'),
+                child: Text('${titles['buynow']}'),
               ),
             if (widget.product.email == user?.email)
               ElevatedButton(
@@ -241,15 +254,14 @@ class _ProductCardState extends State<ProductCard> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text("Confirm Deletion"),
-                        content: const Text(
-                            "Are you sure you want to delete this product?"),
+                        title: Text("${titles['confirmDeletion']}"),
+                        content: Text("${titles['areYouSure']}"),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context); // Close the dialog
                             },
-                            child: const Text("Cancel"),
+                            child: Text("${titles['cancel']}"),
                           ),
                           TextButton(
                             onPressed: () async {
@@ -257,7 +269,7 @@ class _ProductCardState extends State<ProductCard> {
                               await deleteProduct(widget.product.id);
                               Navigator.pop(context); // Close the dialog
                             },
-                            child: const Text("Yes"),
+                            child: Text("${titles['yes']}"),
                           ),
                         ],
                       );
@@ -269,7 +281,7 @@ class _ProductCardState extends State<ProductCard> {
                   foregroundColor: Colors.white,
                   textStyle: const TextStyle(fontSize: 16),
                 ),
-                child: const Text('Delete'),
+                child: Text("${titles['delete']}"),
               ),
           ],
         ),

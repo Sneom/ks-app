@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/date_format.dart';
 import 'package:kisan/components/Products/product_design.dart';
 import 'package:kisan/components/Products/product_format.dart';
 import 'package:kisan/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductListPage extends StatefulWidget {
   @override
@@ -25,13 +27,23 @@ class _ProductListPageState extends State<ProductListPage> {
   bool _isNearMe = true;
   bool _isMyProducts = true;
   bool _isFetchingLocation = false;
+  String selectedLanguage = '';
+
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
+    _loadSelectedLanguage();
 
     // Fetch initial products
     _fetchProducts();
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    });
   }
 
   @override
@@ -120,6 +132,8 @@ class _ProductListPageState extends State<ProductListPage> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> titles =
+        LanguageTexts.marketTexts[selectedLanguage] ?? {};
     return Scaffold(
       backgroundColor: const Color(0xFF7A9D54),
       body: CustomScrollView(
@@ -158,8 +172,8 @@ class _ProductListPageState extends State<ProductListPage> {
                                   cursorColor: const Color(0xFF7A9D54),
                                   controller: _searchController,
                                   onChanged: _searchProducts,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Search Products...',
+                                  decoration: InputDecoration(
+                                    hintText: '${titles['searchproducts']}',
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -183,8 +197,8 @@ class _ProductListPageState extends State<ProductListPage> {
                                   ),
                                   child: Text(
                                     _isMyProducts
-                                        ? 'My Products'
-                                        : 'All Products',
+                                        ? '${titles['myproducts']}'
+                                        : '${titles['allproducts']}',
                                     style: const TextStyle(fontSize: 15),
                                   ),
                                 ),
@@ -210,20 +224,22 @@ class _ProductListPageState extends State<ProductListPage> {
                                           vertical: 10),
                                     ),
                                     child: Text(
-                                      _isNearMe ? 'Near Me' : 'Not Near Me',
+                                      _isNearMe
+                                          ? '${titles['nearme']}'
+                                          : '${titles['notnearme']}',
                                       style: const TextStyle(fontSize: 15),
                                     ),
                                   ),
                                 ),
                               if (_isFetchingLocation)
-                                const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
                                   child: Row(
                                     children: [
-                                      Text('Fetching Location'),
-                                      SizedBox(width: 8.0),
-                                      CircularProgressIndicator(
+                                      Text('${titles['fetching']}'),
+                                      const SizedBox(width: 8.0),
+                                      const CircularProgressIndicator(
                                         backgroundColor: Color(0xFF557A46),
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
@@ -309,7 +325,6 @@ class _ProductListPageState extends State<ProductListPage> {
   void _showProductsNotNearMe() {
     city = '';
     state = '';
-    print("city : $city  state : $state");
     _isNearMe = true;
     _refreshProducts();
   }

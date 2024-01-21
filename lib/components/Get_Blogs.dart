@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/components/Navigation.dart';
 import 'package:kisan/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,15 +40,34 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
   int _currentPage = 0;
   TextEditingController _noteController = TextEditingController();
   List<String> _notes = [];
+  String selectedLanguage = '';
 
   @override
   void initState() {
     super.initState();
+    _loadSelectedLanguage();
+
     _fetchSupabaseBlogs = fetchSupabaseBlogs();
     _pageController = PageController();
 
     // Load saved notes during widget initialization
     _loadNotes(widget.title);
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    });
+  }
+
+  String convertToTitleCase(String text) {
+    if (text.isEmpty) {
+      return text;
+    }
+
+    // Convert the first character to uppercase and concatenate the rest of the string.
+    return text[0].toUpperCase() + text.substring(1);
   }
 
   Future<void> _loadNotes(String title) async {
@@ -67,10 +87,16 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
   }
 
   Future<List<Map<String, dynamic>>> fetchSupabaseBlogs() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    String convertedText = convertToTitleCase(selectedLanguage);
+    print("Asdasdasdasdas $selectedLanguage");
     final response = await supabase
         .from('blogs')
         .select('*')
         .eq('category', widget.title)
+        .eq('language', convertedText)
         .order('created_at', ascending: false);
 
     if (response.isEmpty) {
@@ -92,13 +118,15 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> titles =
+        LanguageTexts.headerTitle[selectedLanguage] ?? {};
     return Scaffold(
       backgroundColor: const Color(0xFF7A9D54),
       body: FutureBuilder(
         future: _fetchSupabaseBlogs,
         builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(
                 backgroundColor: Color(0xFF557A46),
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF2EE9D)),
@@ -123,7 +151,7 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Navigation(
+                              builder: (context) => const Navigation(
                                 page: 0,
                               ),
                             ),
@@ -134,8 +162,8 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
                   ),
                   Center(
                     child: Text(
-                      'Could not get the requested data!!',
-                      style: TextStyle(
+                      '${titles['error']}',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         color: Color(0xFFF2EE9D),
@@ -195,7 +223,7 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Navigation(
+                            builder: (context) => const Navigation(
                               page: 0,
                             ),
                           ),
@@ -213,13 +241,13 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
                     children: [
                       Text(
                         'Post ${_currentPage + 1} of ${jsonData.length}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 10),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -237,6 +265,9 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
       DateTime dateTime = DateTime.parse(dateTimeString);
       return DateFormat('dd MMM yyyy').format(dateTime);
     }
+
+    Map<String, String> titles =
+        LanguageTexts.headerTitle[selectedLanguage] ?? {};
 
     return Stack(
       children: [
@@ -258,27 +289,28 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 28,
-                  color: isRead ? Color(0xFFF2EE9D) : Colors.white,
+                  color: isRead ? const Color(0xFFF2EE9D) : Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 data['description'] ?? '',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,
                 ),
               ),
               Text(
-                "Created: ${_formatDateTime(data['created_at'])}" ?? '',
-                style: TextStyle(
+                "${titles['created']}: ${_formatDateTime(data['created_at'])}" ??
+                    '',
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                isRead ? "Read" : "Not Read",
+                isRead ? "${titles['read']}" : "${titles['notread']}",
                 style: TextStyle(
                   fontSize: 16,
                   color: isRead ? Colors.red : Colors.green,
@@ -301,7 +333,7 @@ class _SupabaseBlogsState extends State<SupabaseBlogs> {
                       );
                     },
                     child: Text(
-                      'Read More',
+                      '${titles['readmore']}',
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -339,7 +371,7 @@ class BlogContentWidget extends StatelessWidget {
             transform: Matrix4.diagonal3Values(1.0, 1.0, 1.0),
             child: HtmlWidget(
               htmlContent,
-              textStyle: TextStyle(fontSize: 8.0, color: Colors.black),
+              textStyle: const TextStyle(fontSize: 8.0, color: Colors.black),
             ),
           ),
         ),

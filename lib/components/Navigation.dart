@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:kisan/components/Auth.dart';
 import 'package:kisan/components/Get_Blogs.dart';
 import 'package:kisan/components/Home.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/agri_products.dart';
 import 'package:kisan/components/Profile.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Navigation extends StatelessWidget {
   @override
@@ -65,12 +67,22 @@ class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState({required this.page});
   int _currentIndex = 0;
   late PageController _pageController;
+  String selectedLanguage = '';
 
   @override
   void initState() {
     super.initState();
+    _loadSelectedLanguage();
+
     _currentIndex = page;
     _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  Future<void> _loadSelectedLanguage() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+    });
   }
 
   @override
@@ -81,26 +93,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> titles =
+        LanguageTexts.headerTitle[selectedLanguage] ?? {};
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF557A46), // Earthy green color
-        title: const Text(
-          'Kisan Sathi',
-          style: TextStyle(
+        title: Text(
+          '${titles['kisansathi']}',
+          style: const TextStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Color(0xFFF2EE9D),
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle),
-            color: Colors.white,
+            color: Color(0xFFF2EE9D),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfilePage()),
+                MaterialPageRoute(
+                    builder: (context) => ProfilePage(
+                          selectedLanguage: selectedLanguage,
+                        )),
               );
             },
           ),
@@ -128,28 +145,28 @@ class _MyHomePageState extends State<MyHomePage> {
                   _pageController.jumpToPage(index);
                 });
               },
-              items: const [
+              items: [
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
                   icon: Icon(
                     Icons.home,
                   ),
-                  label: 'Learn',
+                  label: '${titles['learn']}',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.store),
-                  label: 'Market',
+                  label: '${titles['market']}',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.cloud),
-                  label: 'Weather',
+                  label: '${titles['learn']}',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.feedback),
-                  label: 'Feedback',
+                  label: '${titles['learn']}',
                 )
               ],
             )
