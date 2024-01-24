@@ -13,6 +13,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+Map<String, String> categoryTexts = {};
+
 class _HomePageState extends State<HomePage> {
   String selectedLanguage = '';
   List<Map<String, dynamic>> weatherData = [];
@@ -33,7 +35,7 @@ class _HomePageState extends State<HomePage> {
     if (selectedLanguage == '') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => GetLanguagePage()),
+        MaterialPageRoute(builder: (context) => const GetLanguagePage()),
       );
     }
   }
@@ -68,9 +70,9 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Updated Category Cards
               ClickableCategoryCard(
                 icon: Icons.eco,
                 engTitle: '${defaultTexts['organicfarming']}',
@@ -103,6 +105,8 @@ class _HomePageState extends State<HomePage> {
                 selectedLanguage: selectedLanguage,
               ),
               const SizedBox(height: 16),
+
+              // Updated Weather Information Card
               WeatherInformationWidget(
                 weatherData: weatherData,
                 categoryTexts: categoryTexts,
@@ -385,7 +389,7 @@ class WeatherDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           '${categoryTexts['todaysweather']}',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFF438C6E), // Adjusted color
         foregroundColor: Colors.white,

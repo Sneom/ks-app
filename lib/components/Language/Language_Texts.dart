@@ -11,7 +11,9 @@ class LanguageTexts {
       'readmore': "Read More",
       'read': 'Read',
       'notread': 'Not Read',
-      'created': "Created"
+      'created': "Created",
+      'submit': "Change",
+      'selectlang': "Select your preferred language"
     },
     'hindi': {
       'kisansathi': "किसान साथी",
@@ -24,7 +26,9 @@ class LanguageTexts {
       'readmore': "और पढ़ें",
       'read': 'पढ़ा है',
       'notread': 'पढ़ा नहीं',
-      'created': "लिखा है"
+      'created': "लिखा है",
+      'submit': "बदलो",
+      'selectlang': "अपनी पसंदीदा भाषा चुनें"
     },
     'marathi': {
       'kisansathi': 'किसन साथी',
@@ -37,7 +41,9 @@ class LanguageTexts {
       'readmore': "पुढे वाचा",
       'read': 'वाचले आहे',
       'notread': 'वाचले नाही',
-      'created': "लिहिलेले"
+      'created': "लिहिलेले",
+      'submit': "बदला",
+      'selectlang': "तुमची पसंतीची भाषा निवडा"
     },
     'telugu': {
       'kisansathi': 'కిసాన్ సతి',
@@ -50,7 +56,9 @@ class LanguageTexts {
       'readmore': "ఇంకా చదవండి",
       'read': 'చదవండి',
       'notread': 'చదవలేదు',
-      'created': "సృష్టించారు"
+      'created': "సృష్టించారు",
+      'submit': "సమర్పించండి",
+      'selectlang': "మీకు ఇష్టమైన భాషను ఎంచుకోండి"
     }
   };
 

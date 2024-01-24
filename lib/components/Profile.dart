@@ -29,7 +29,7 @@ class ProfilePage extends StatelessWidget {
         ),
         foregroundColor: Colors.white,
       ),
-      backgroundColor: const Color(0xFFF2EE9D),
+      backgroundColor: Color.fromARGB(255, 255, 253, 209),
       body: ListView(
         children: [
           ListTile(

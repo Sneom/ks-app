@@ -48,60 +48,68 @@ class _SignInPageState extends State<SignInPage> {
     Map<String, String> titles =
         LanguageTexts.headerTitle[selectedLanguage] ?? {};
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 6, 31, 44),
-      body: Center(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/signin_image.png'), // Add your image path
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Container(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "${titles['kisansathi']}",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 64,
-                    fontWeight: FontWeight.bold,
+          color: Colors.black.withOpacity(0.8), // Adjust the opacity as needed
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${titles['kisansathi']}",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 64,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  "${titles['siddhigiri']}",
-                  style: TextStyle(
-                    color: Colors.lightGreen,
+                  Text(
+                    "${titles['siddhigiri']}",
+                    style: TextStyle(
+                      color: Colors.lightGreen,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 90),
-                Text(
-                  "${titles['login']}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 90),
+                  Text(
+                    "${titles['login']}",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 15),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await _googleSignIn();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF1B4242),
-                    onPrimary: Colors.white,
-                    padding: EdgeInsets.all(20),
+                  SizedBox(height: 15),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await _googleSignIn();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFF1B4242),
+                      onPrimary: Colors.white,
+                      padding: EdgeInsets.all(20),
+                    ),
+                    icon: Image.asset('assets/google_logo.webp', height: 30),
+                    label: Text("${titles['logingoogle']}",
+                        style: TextStyle(fontSize: 18)),
                   ),
-                  icon: Image.asset('assets/google_logo.webp', height: 30),
-                  label: Text("${titles['logingoogle']}",
-                      style: TextStyle(fontSize: 18)),
-                ),
-                SizedBox(height: 15),
-                Text(
-                  authStatus,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+                  SizedBox(height: 15),
+                  Text(
+                    authStatus,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                SizedBox(height: 15),
-              ],
+                  SizedBox(height: 15),
+                ],
+              ),
             ),
           ),
         ),

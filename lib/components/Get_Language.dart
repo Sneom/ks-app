@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Auth.dart';
+import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +13,7 @@ class GetLanguagePage extends StatefulWidget {
 }
 
 class _GetLanguagePageState extends State<GetLanguagePage> {
-  String selectedLanguage = '';
+  String selectedLanguage = 'english';
   final _user = supabase.auth.currentUser;
 
   @override
@@ -24,7 +25,8 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
   Future<void> _loadSelectedLanguage() async {
     final preferences = await SharedPreferences.getInstance();
     setState(() {
-      selectedLanguage = preferences.getString('selectedLanguage') ?? '';
+      selectedLanguage = preferences.getString('selectedLanguage') ?? 'english';
+      ;
     });
   }
 
@@ -35,7 +37,10 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> titles =
+        LanguageTexts.headerTitle[selectedLanguage] ?? {};
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 255, 253, 209),
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor:
@@ -46,8 +51,8 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Select your preferred language:',
+            Text(
+              '${titles['selectlang']}',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -58,10 +63,10 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
             Column(
               children: [
                 buildLanguageCard('English', 'english', Icons.language),
-                buildLanguageCard('Hindi', 'hindi', Icons.language),
-                buildLanguageCard('Marathi', 'marathi', Icons.language),
-                buildLanguageCard('Telugu', 'telugu', Icons.language),
-                buildLanguageCard('Tamil', 'tamil', Icons.language),
+                buildLanguageCard('हिंदी', 'hindi', Icons.language),
+                buildLanguageCard('मराठी', 'marathi', Icons.language),
+                buildLanguageCard('తెలుగు', 'telugu', Icons.language),
+                buildLanguageCard('తమిళం', 'tamil', Icons.language),
                 // Add more languages as needed
               ],
             ),
@@ -75,8 +80,8 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
                   print('Please select a language');
                 }
               },
-              child: const Text(
-                'Submit',
+              child: Text(
+                '${titles['submit']}',
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
