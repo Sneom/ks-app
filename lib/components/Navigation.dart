@@ -6,6 +6,7 @@ import 'package:kisan/components/Language/Language_Texts.dart';
 import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/agri_products.dart';
 import 'package:kisan/components/Profile.dart';
+import 'package:kisan/components/Tourism/AgroTourism.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -130,7 +131,11 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentIndex = index;
           });
         },
-        children: [const HomePage(), ProductListPage()],
+        children: [
+          Tourism(),
+          const HomePage(),
+          ProductListPage(),
+        ],
         //children: [AddProductScreen()],
       ),
       bottomNavigationBar: supabase.auth.currentUser != null

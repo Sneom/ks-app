@@ -40,11 +40,11 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
     Map<String, String> titles =
         LanguageTexts.headerTitle[selectedLanguage] ?? {};
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 253, 209),
+      backgroundColor: const Color.fromARGB(255, 255, 253, 209),
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor:
-            Color(0xFF557A46), // Set the green color for the app bar
+            const Color(0xFF557A46), // Set the green color for the app bar
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -53,7 +53,7 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
           children: [
             Text(
               '${titles['selectlang']}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF557A46), // Set the green color for the text
@@ -82,11 +82,11 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
               },
               child: Text(
                 '${titles['submit']}',
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
-                primary:
-                    Color(0xFF557A46), // Set the green color for the button
+                primary: const Color(
+                    0xFF557A46), // Set the green color for the button
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
@@ -111,14 +111,14 @@ class _GetLanguagePageState extends State<GetLanguagePage> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(
                 8.0), // Set your desired border radius for the ListTile
-            color: selectedLanguage == value ? Color(0xFFF2EE9D) : null,
+            color: selectedLanguage == value ? const Color(0xFFF2EE9D) : null,
           ),
           child: ListTile(
             title: Text(
               label,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            leading: Icon(iconData, color: Color(0xFF557A46)),
+            leading: Icon(iconData, color: const Color(0xFF557A46)),
             onTap: () {
               setState(() {
                 selectedLanguage = value;
