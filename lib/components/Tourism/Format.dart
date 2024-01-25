@@ -1,4 +1,5 @@
 class TourismSpot {
+  final String id;
   final String name;
   final String imageURL;
   final String description;
@@ -8,6 +9,7 @@ class TourismSpot {
   int views;
 
   TourismSpot({
+    required this.id,
     required this.name,
     required this.imageURL,
     required this.description,

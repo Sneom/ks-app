@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Tourism/AddSpots.dart';
 import 'package:kisan/components/Tourism/DetailsPage.dart';
+import 'package:kisan/components/Tourism/Format.dart';
 import 'package:kisan/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Tourism extends StatefulWidget {
   const Tourism({Key? key}) : super(key: key);
@@ -22,10 +24,10 @@ class _TourismSpotPage extends State<Tourism> {
 
   Future<void> fetchTourismSpots() async {
     try {
-      final response = await supabase.from('agro_tourism').select();
+      final response =
+          await supabase.from('agro_tourism').select().eq('verified', 'TRUE');
 
       if (response.isEmpty) {
-        // Handle the case where no data is available
         print('No data available.');
       }
 
@@ -33,6 +35,7 @@ class _TourismSpotPage extends State<Tourism> {
 
       for (var row in response as List) {
         list.add(TourismSpot(
+          id: row['id'] as String,
           name: row['name'] as String,
           imageURL: row['imageurl'] as String,
           description: row['description'] as String,
@@ -48,7 +51,6 @@ class _TourismSpotPage extends State<Tourism> {
         isLoading = false;
       });
     } catch (error) {
-      // Handle errors gracefully
       print('Error fetching data: $error');
       setState(() {
         isLoading = false;
@@ -81,7 +83,25 @@ class _TourismSpotPage extends State<Tourism> {
                           itemCount: tourismSpots.length,
                           itemBuilder: (context, index) {
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                String cardId = tourismSpots[index].id;
+
+                                if (!prefs.containsKey(cardId)) {
+                                  prefs.setBool(cardId, true);
+
+                                  setState(() {
+                                    tourismSpots[index].views++;
+                                  });
+                                  int views = tourismSpots[index].views;
+
+                                  final response = await supabase
+                                      .from('agro_tourism')
+                                      .update({
+                                    'views': '${tourismSpots[index].views}'
+                                  }).eq('id', '$cardId');
+                                }
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

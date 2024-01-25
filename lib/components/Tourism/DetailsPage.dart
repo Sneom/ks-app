@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kisan/components/Tourism/AddSpots.dart';
+import 'package:kisan/components/Tourism/Format.dart';
 
 class TourismSpotCard extends StatelessWidget {
   final TourismSpot tourismSpot;
@@ -17,7 +18,8 @@ class TourismSpotCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(15.0)),
             child: Image.network(
               "http://wddgaaiyqdiexmerxnue.supabase.co/storage/v1/object/public/products_images/${tourismSpot.imageURL}",
               fit: BoxFit.cover,
@@ -29,7 +31,7 @@ class TourismSpotCard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               tourismSpot.name,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white, // Text color
@@ -44,12 +46,12 @@ class TourismSpotCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.visibility,
+                    const Icon(Icons.visibility,
                         color: Colors.green), // Visibility icon
-                    SizedBox(width: 4.0),
+                    const SizedBox(width: 4.0),
                     Text(
                       tourismSpot.views.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black, // Views count text color
                       ),
                     ),
@@ -57,12 +59,12 @@ class TourismSpotCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Icon(Icons.location_on,
+                    const Icon(Icons.location_on,
                         color: Colors.green), // Visibility icon
-                    SizedBox(width: 4.0),
+                    const SizedBox(width: 4.0),
                     Text(
                       "${_truncateLocation(tourismSpot.location)}",
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black, // Views count text color
                       ),
                     ),
@@ -117,7 +119,7 @@ class _TourismSpotDetailsPageState extends State<TourismSpotDetailsPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -127,41 +129,41 @@ class _TourismSpotDetailsPageState extends State<TourismSpotDetailsPage> {
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
-              SizedBox(height: 16.0),
-              Text(
+              const SizedBox(height: 16.0),
+              const Text(
                 'Description:',
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                 widget.tourismSpot.description,
-                style: TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 16.0),
-              Text(
+              const SizedBox(height: 16.0),
+              const Text(
                 'Location:',
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                 widget.tourismSpot.location,
-                style: TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 16.0),
-              Text(
+              const SizedBox(height: 16.0),
+              const Text(
                 'Image Gallery:',
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Container(
                 height: 300,
                 child: Stack(
@@ -186,12 +188,12 @@ class _TourismSpotDetailsPageState extends State<TourismSpotDetailsPage> {
                       Positioned(
                         left: 16,
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Color(0x80FFFFFF),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_back),
+                            icon: const Icon(Icons.arrow_back),
                             onPressed: () {
                               pageController.previousPage(
                                 duration: const Duration(milliseconds: 300),
@@ -206,12 +208,12 @@ class _TourismSpotDetailsPageState extends State<TourismSpotDetailsPage> {
                       Positioned(
                         right: 16,
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Color(0x80FFFFFF),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_forward),
+                            icon: const Icon(Icons.arrow_forward),
                             onPressed: () {
                               pageController.nextPage(
                                 duration: const Duration(milliseconds: 300),

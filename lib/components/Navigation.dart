@@ -132,9 +132,9 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
         children: [
-          Tourism(),
           const HomePage(),
           ProductListPage(),
+          Tourism(),
         ],
         //children: [AddProductScreen()],
       ),
@@ -165,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
-                  icon: Icon(Icons.cloud),
+                  icon: Icon(Icons.tour),
                   label: '${titles['learn']}',
                 ),
                 BottomNavigationBarItem(
