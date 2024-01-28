@@ -7,6 +7,7 @@ import 'package:kisan/components/Products/add_products.dart';
 import 'package:kisan/components/Products/agri_products.dart';
 import 'package:kisan/components/Profile.dart';
 import 'package:kisan/components/Tourism/AgroTourism.dart';
+import 'package:kisan/components/Stories/SuccessStories.dart';
 import 'package:kisan/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -135,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const HomePage(),
           ProductListPage(),
           Tourism(),
+          Stories(),
         ],
         //children: [AddProductScreen()],
       ),
@@ -166,12 +168,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.tour),
-                  label: '${titles['learn']}',
+                  label: '${titles['Tourism']}',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Color(0xFF557A46),
                   icon: Icon(Icons.feedback),
-                  label: '${titles['learn']}',
+                  label: '${titles['Stories']}',
                 )
               ],
             )
